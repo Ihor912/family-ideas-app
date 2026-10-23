@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "validate:private": "node --import tsx scripts/validate-private.ts",
-    "dev:demo": "VITE_DEMO_MODE=true vite --host 127.0.0.1"
+    "dev:demo": "VITE_DEMO_MODE=true vite --host 127.0.0.1",
+    "migrate:private": "node --import tsx scripts/migrate-private.ts"
   },
   "dependencies": {
     "@fontsource-variable/nunito": "5.3.0",

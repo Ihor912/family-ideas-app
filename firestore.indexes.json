@@ -7,6 +7,16 @@
       "indexes": []
     },
     {
+      "collectionGroup": "content",
+      "fieldPath": "categories",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "content",
+      "fieldPath": "ideas",
+      "indexes": []
+    },
+    {
       "collectionGroup": "draws",
       "fieldPath": "seenIds",
       "indexes": []

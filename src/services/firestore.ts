@@ -11,21 +11,13 @@ import {
 } from 'firebase/firestore';
 import { parseCatalog } from '../domain/catalog';
 import { selectIdea } from '../domain/selection';
-import type { Catalog, ContentDocument, DrawState } from '../domain/types';
+import type { Catalog, DrawState } from '../domain/types';
 import type { AppServices, FamilySnapshot } from './types';
 
 export type FamilyServices = Pick<AppServices, 'subscribeFamily' | 'drawIdea'>;
 
 const emptyHistory = (): DrawState => ({ seenIds: [], lastIdeaId: null });
 const emptySnapshot = (status: FamilySnapshot['status']): FamilySnapshot => ({ status, catalog: null, history: null });
-
-function readContent(data: DocumentData | undefined): ContentDocument {
-  if (!data || typeof data.markdown !== 'string' || !Array.isArray(data.excludedSections)
-    || !data.excludedSections.every((section: unknown) => typeof section === 'string')) {
-    throw new Error('The private activity collection is missing or invalid.');
-  }
-  return { markdown: data.markdown, excludedSections: data.excludedSections as string[] };
-}
 
 function readHistory(data: DocumentData | undefined): DrawState {
   if (!data) return emptyHistory();
@@ -98,7 +90,7 @@ export function createFamilyServices(app: FirebaseApp, getUserId: () => string |
       stopContent = onSnapshot(doc(database, 'content', 'current'), (content) => {
         if (disposed || generation !== listenerGeneration) return;
         try {
-          catalog = parseCatalog(readContent(content.data()));
+          catalog = parseCatalog(content.data());
           publish();
         } catch (reason) {
           reportError(reason);
@@ -136,7 +128,7 @@ export function createFamilyServices(app: FirebaseApp, getUserId: () => string |
         transaction.get(contentRef),
         transaction.get(historyRef),
       ]);
-      const catalog = parseCatalog(readContent(content.data()));
+      const catalog = parseCatalog(content.data());
       const history = readHistory(progress.data());
       // A stale exhausted screen or transaction retry must join a round another
       // device has already started, rather than erase its first selection.

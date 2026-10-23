@@ -9,8 +9,13 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const toggleSound = useCallback(() => {
     const enabled = !enabledRef.current;
     enabledRef.current = enabled;
-    if (enabled) audioEngine.prepare();
-    else audioEngine.stop();
+    if (enabled) {
+      audioEngine.prepare();
+      audioEngine.play('plink');
+    }
+    // A fresh context on the next enable also recovers iOS audio devices that
+    // remain silent after an interruption even while reporting "running".
+    else audioEngine.dispose();
     setSoundEnabled(enabled);
     try {
       localStorage.setItem(SOUND_STORAGE_KEY, String(enabled));

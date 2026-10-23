@@ -22,11 +22,14 @@ describe('SoundProvider', () => {
     expect(audioEngine.play).not.toHaveBeenCalled();
     act(() => result.current.toggleSound());
     expect(audioEngine.prepare).toHaveBeenCalledTimes(1);
+    expect(audioEngine.play).toHaveBeenCalledExactlyOnceWith('plink');
+    expect(vi.mocked(audioEngine.prepare).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(audioEngine.play).mock.invocationCallOrder[0]);
     expect(localStorage.getItem(SOUND_STORAGE_KEY)).toBe('true');
     act(() => result.current.play('plink'));
     expect(audioEngine.play).toHaveBeenCalledWith('plink');
     act(() => result.current.toggleSound());
-    expect(audioEngine.stop).toHaveBeenCalledTimes(1);
+    expect(audioEngine.dispose).toHaveBeenCalledTimes(1);
+    expect(audioEngine.play).toHaveBeenCalledTimes(2);
     act(() => result.current.play('chime'));
     expect(audioEngine.play).not.toHaveBeenCalledWith('chime');
   });
@@ -37,6 +40,19 @@ describe('SoundProvider', () => {
     expect(result.current.soundEnabled).toBe(true);
     expect(audioEngine.prepare).not.toHaveBeenCalled();
     expect(audioEngine.play).not.toHaveBeenCalled();
+  });
+
+  it('disposes on explicit mute so re-enabling can recover a stuck iPhone audio context', () => {
+    const { result } = renderHook(useSound, { wrapper: SoundProvider });
+    act(() => result.current.toggleSound());
+    act(() => result.current.toggleSound());
+    act(() => result.current.toggleSound());
+    expect(audioEngine.dispose).toHaveBeenCalledTimes(1);
+    expect(audioEngine.prepare).toHaveBeenCalledTimes(2);
+    expect(audioEngine.play).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(audioEngine.prepare).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(audioEngine.dispose).mock.invocationCallOrder[0]);
+    expect(vi.mocked(audioEngine.dispose).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(audioEngine.prepare).mock.invocationCallOrder[1]);
+    expect(result.current.soundEnabled).toBe(true);
   });
 
   it('continues to work when persistent browser storage is blocked', () => {

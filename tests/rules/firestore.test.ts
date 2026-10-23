@@ -18,9 +18,9 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { parseCatalog } from '../../src/domain/catalog';
+import { parseCatalog, toStructuredContent } from '../../src/domain/catalog';
 import { selectIdea } from '../../src/domain/selection';
-import { ALL_CATEGORIES, type ContentDocument, type DrawState } from '../../src/domain/types';
+import { ALL_CATEGORIES, type ContentDocument, type DrawState, type LegacyContentDocument } from '../../src/domain/types';
 
 const sampleContent: ContentDocument = {
   markdown: '## Космос\n- Збудувати паперову ракету.\n- Намалювати нову планету.\n\n## Удома\n- Зробити театр тіней.',
@@ -202,6 +202,41 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)('Firestore authorization a
     const history = await getDoc(doc(google('alice'), 'draws/current'));
     expect(history.data()?.seenIds).toHaveLength(3);
     expect(new Set(history.data()?.seenIds)).toEqual(new Set([otherIdea.id, ...results]));
+  });
+
+  it('preserves seen IDs across a structured migration and later wording edits', async () => {
+    const before = parseCatalog(sampleContent);
+    const previousIdea = before.ideas[0]!;
+    const structured = toStructuredContent(sampleContent as LegacyContentDocument);
+    await env.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'draws/current'), {
+        seenIds: [previousIdea.id], lastIdeaId: previousIdea.id, updatedAt: Timestamp.now(),
+      });
+      await setDoc(doc(context.firestore(), 'content/current'), structured);
+    });
+
+    const db = google('alice');
+    const remoteContent = await getDoc(doc(db, 'content/current'));
+    expect(Object.keys(remoteContent.data()!).sort()).toEqual(['categories', 'ideas', 'schemaVersion']);
+    expect(parseCatalog(remoteContent.data()).ideas.map(({ id }) => id).sort())
+      .toEqual(before.ideas.map(({ id }) => id).sort());
+    const migratedHistory = await getDoc(doc(db, 'draws/current'));
+    expect(migratedHistory.data()?.seenIds).toEqual([previousIdea.id]);
+
+    // An owner can edit the text without making an already-seen record new.
+    structured.ideas[previousIdea.id]!.markdown = 'Оновлена пригода з тим самим постійним ID.';
+    await env.withSecurityRulesDisabled((context) => setDoc(doc(context.firestore(), 'content/current'), structured));
+    const result = await runTransaction(db, async (transaction) => {
+      const content = await transaction.get(doc(db, 'content/current'));
+      const history = await transaction.get(doc(db, 'draws/current'));
+      const selection = selectIdea(parseCatalog(content.data()), history.data() as DrawState, ALL_CATEGORIES, false, () => 0);
+      if (selection.kind !== 'drawn') throw new Error('Expected another available activity');
+      transaction.set(doc(db, 'draws/current'), { ...selection.state, updatedAt: serverTimestamp() });
+      return selection;
+    });
+    expect(result.idea.id).not.toBe(previousIdea.id);
+    expect(result.state.seenIds).toContain(previousIdea.id);
+    expect(result.state.seenIds).toHaveLength(2);
   });
 
   it('retries a draw against content replaced while its transaction is in flight', async () => {
