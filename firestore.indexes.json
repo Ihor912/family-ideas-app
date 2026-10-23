@@ -1,0 +1,15 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "content",
+      "fieldPath": "markdown",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "draws",
+      "fieldPath": "seenIds",
+      "indexes": []
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+.app { position: relative; min-height: 100svh; overflow: clip; background: radial-gradient(ellipse at 81% 32%, #28325366 0%, transparent 48%), #151b35; }
+.pageShell { position: relative; width: min(1224px, calc(100% - 112px)); margin: 0 auto; z-index: 1; }
+.backgroundStars { position: absolute; inset: 0; pointer-events: none; opacity: .6; background-image: radial-gradient(circle at 5% 27%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 39% 12%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 91% 13%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 45% 52%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 92% 68%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 31% 77%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 5% 85%, #8794b7 0 1px, transparent 1.5px), radial-gradient(circle at 70% 87%, #8794b7 0 1px, transparent 1.5px); }
+.header { display: flex; align-items: center; justify-content: space-between; height: 114px; border-bottom: 1px solid #a6b8de14; gap: 24px; }
+.brand { display: inline-flex; align-items: center; gap: 13px; text-decoration: none; font-size: 19px; font-weight: 850; line-height: 1.03; letter-spacing: -.6px; }
+.brandSecond { display: block; font-size: 27px; }
+.brandDot { color: #f4ce79; }
+.brandIcon { display: grid; place-items: center; width: 49px; height: 49px; border: 1px solid #e8b89955; border-radius: 16px; color: #f2b7a1; background: #f2b7a108; transform: rotate(-8deg); }
+.brandIcon svg { transform: rotate(8deg); }
+.headerActions { display: flex; align-items: center; gap: 18px; }
+.soundButton { display: flex; align-items: center; gap: 9px; background: #fff4e407; border: 1px solid #b6c2eb22; border-radius: 99px; color: #bec7de; min-height: 42px; padding: 0 16px; font-size: 12px; font-weight: 700; transition: border-color .2s, color .2s, background .2s; }
+.soundButton:hover { color: #fff6e6; border-color: #b6c2eb66; }
+.soundOn { color: #a6e0cd; background: #87d6c512; border-color: #87d6c547; }
+.headerDivider { width: 1px; height: 25px; background: #b6c2eb22; }
+.userName { color: #d9dded; font-size: 13px; font-weight: 700; }
+.signOutButton, .smallIconButton { display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: #aebbd5; width: 36px; min-height: 36px; border-radius: 50%; }
+.signOutButton:hover, .smallIconButton:hover { color: #fff7e9; background: #fff4e412; }
+.main { position: relative; display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; min-height: 675px; padding: 64px 0 62px; gap: 30px; }
+.heroCopy { position: relative; z-index: 3; }
+.eyebrow { display: flex; align-items: center; gap: 9px; font-weight: 800; color: #b3bed8; font-size: 10px; letter-spacing: 1.7px; margin-bottom: 26px; }
+.eyebrowStar { font-size: 18px; color: #a6d6c6; line-height: 1; }
+.heroTitle { font-size: clamp(43px, 4.6vw, 65px); font-weight: 900; line-height: 1.13; letter-spacing: -2.7px; margin: 0 0 29px; color: #fcf5e6; }
+.heroTitle > span { color: #f4ce79; }
+.todayWord { position: relative; display: inline-block; }
+.todayWord svg { position: absolute; bottom: -8px; left: 1%; width: 99%; height: 13px; opacity: .7; transform: rotate(-1deg); }
+.heroDescription { font-size: 16px; line-height: 1.8; color: #aebad5; max-width: 370px; margin: 0 0 32px; font-weight: 500; }
+.loginControls { display: flex; flex-direction: column; align-items: flex-start; }
+.googleButton { border: 1px solid #faf2e4; background: #faf2e4; color: #22263d; border-radius: 15px; min-height: 60px; padding: 0 23px; display: flex; align-items: center; gap: 13px; font-size: 15px; font-weight: 850; box-shadow: 0 5px 0 #d2c7af; transition: background .2s, transform .2s, box-shadow .2s; }
+.googleButton > svg:last-child { margin-left: 16px; }
+.googleButton:hover { transform: translateY(-2px); background: #fff9ef; box-shadow: 0 7px 0 #d2c7af; }
+.googleButton:active { transform: translateY(3px); box-shadow: 0 2px 0 #d2c7af; }
+.loginHint { display: flex; align-items: center; gap: 7px; margin: 18px 0 0; font-size: 11px; color: #8693b1; }
+.loginHint svg { color: #a99cc8; }
+.heroFootnote { display: flex; align-items: center; gap: 12px; margin-top: 39px; }
+.littleAstronaut { width: 37px; height: 42px; transform: rotate(-7deg); }
+.littleAstronaut svg { width: 100%; height: 100%; }
+.heroFootnote p { font-size: 11px; line-height: 1.7; color: #8c9ab8; margin: 0; }
+.heroFootnote strong { color: #a8b4cd; font-weight: 600; }
+.visualStage { min-width: 0; position: relative; z-index: 1; align-self: stretch; display: flex; justify-content: center; flex-direction: column; }
+.spaceScene { width: calc(100% + 55px); margin-left: -20px; aspect-ratio: 600 / 580; position: relative; }
+.sceneCompact { width: 100%; }
+.sceneGlow { position: absolute; inset: 15% 16%; border-radius: 50%; background: #8986cb10; box-shadow: 0 0 100px 30px #8986cb07; }
+.orbitArtwork { width: 100%; position: absolute; inset: 0; }
+.rocketArtwork { position: absolute; width: 69%; height: 82%; left: 14%; top: 1%; filter: drop-shadow(0 25px 25px #0b102638); }
+.orbitLabel { position: absolute; left: 5%; top: 20%; transform: rotate(-12deg); display: flex; align-items: center; gap: 7px; color: #a3b2d1; font-weight: 650; font-size: 10px; letter-spacing: .3px; }
+.orbitLabel > span { width: 5px; height: 5px; border-radius: 100%; background: #a2d7c7; box-shadow: 0 0 9px #a2d7c755; }
+.sceneNote { position: absolute; right: -1%; bottom: 12%; display: flex; align-items: center; gap: 12px; padding: 17px 21px 17px 17px; border: 1px solid #8092bf3b; border-radius: 16px; background: #242c49; box-shadow: 0 15px 25px #10152c33; color: #bbc6dd; font-size: 13px; line-height: 1.65; transform: rotate(-7deg); }
+.sceneNote strong { color: #fff2d8; font-weight: 800; }
+.noteStar { display: grid; place-items: center; width: 36px; height: 42px; font-size: 33px; color: #f4cf7c; }
+.stageCaption { text-align: center; margin: -13px 0 -3px; }
+.stageCaption > span { color: #6f7e9f; font-size: 8px; font-weight: 800; letter-spacing: 2px; }
+.stageCaption p { font-size: 11px; color: #8593b2; margin: 7px 0 0; }
+.pickerControls { max-width: 380px; }
+.categoryPicker { position: relative; margin-bottom: 20px; z-index: 10; }
+.categoryTrigger { display: flex; align-items: center; padding: 12px 16px 12px 13px; min-height: 67px; border: 1px solid #b7c5e42d; border-radius: 14px; list-style: none; background: #252e481f; color: #e2e5ed; cursor: pointer; gap: 12px; user-select: none; transition: background .2s, border-color .2s; }
+.categoryTrigger::-webkit-details-marker { display: none; }
+.categoryTrigger:hover { border-color: #b7c5e46b; background: #252e4866; }
+.categoryTrigger[aria-disabled='true'] { opacity: .6; cursor: default; }
+.categoryOrb { display: grid; place-items: center; background: #bca9f019; border: 1px solid #bca9f02b; color: #c4b2f4; font-size: 21px; border-radius: 11px; width: 38px; height: 38px; flex-shrink: 0; }
+.controlEyebrow { display: block; font-size: 10px; color: #8998b7; line-height: 1.2; margin-bottom: 4px; }
+.selectedCategory { display: block; font-size: 14px; font-weight: 750; line-height: 1.2; }
+.categoryChevron { margin-left: auto; color: #9cacc9; transition: transform .2s; }
+.categoryPicker[open] .categoryChevron { transform: rotate(180deg); }
+.categoryMenu { position: absolute; top: calc(100% + 8px); left: 0; width: max(100%, 430px); padding: 16px; border: 1px solid #8291b35c; background: #222b47; border-radius: 17px; box-shadow: 0 18px 50px #080c24aa; z-index: 20; }
+.categoryMenuHeading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 2px 10px; font-size: 13px; font-weight: 800; color: #f6efdd; }
+.categoryMenuHeading .smallIconButton { width: 26px; height: 26px; min-height: 26px; }
+.categoryGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0; border: 0; gap: 7px; margin: 0; }
+.categoryOption { display: flex; position: relative; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; border: 1px solid #8192bc2b; border-radius: 10px; min-height: 48px; padding: 8px 25px 8px 8px; color: #bbc6dd; cursor: pointer; transition: background .2s, border .2s; }
+.categoryOption:hover { background: #bca9f00e; border-color: #bca9f055; }
+.categoryOption:has(input:focus-visible) { outline: 3px solid #f4ce79; outline-offset: 2px; }
+.categoryOption input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.categorySelected { background: #a995e528; border-color: #bca9f096; color: #ede7ff; }
+.categoryOption:first-of-type { grid-column: 1 / -1; }
+.categorySymbol { color: #a9dcce; min-width: 25px; font-size: 23px; text-align: center; }
+.categorySymbol[data-color='1'] { color: #f0b7ae; }
+.categorySymbol[data-color='2'] { color: #eace8a; }
+.categorySymbol[data-color='3'] { color: #bba7eb; }
+.categoryCheck { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #cfbefa; }
+.launchButton { width: 100%; min-height: 62px; display: flex; justify-content: center; align-items: center; gap: 12px; border: 1px solid #f1cb78; color: #292a3c; background: #f4ce79; box-shadow: 0 5px 0 #b68c45, 0 10px 27px #f4ce790b; border-radius: 14px; font-size: 17px; font-weight: 900; letter-spacing: -.3px; padding: 10px 20px; transition: background .2s, box-shadow .2s; }
+.launchButton > svg:last-child:not(:first-child) { margin-left: auto; }
+.launchButton > svg:first-child:not(:last-child) { margin-right: auto; }
+.launchButton:hover:not(:disabled) { background: #ffdc8e; }
+.launchButton:disabled { opacity: .7; box-shadow: 0 3px 0 #a88b54; }
+.drawHint { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 10px; color: #8e9db9; margin: 16px 0 0; }
+.hintDot { width: 4px; height: 4px; background: #8fc7b7; border-radius: 100%; }
+.errorMessage { border-left: 2px solid #efaaa2; padding-left: 12px; color: #efbcb4; font-size: 12px; line-height: 1.6; max-width: 380px; margin: 20px 0 0; }
+.exhaustedMessage { background: #b8a4ed0d; border: 1px solid #b8a4ed22; padding: 18px; border-radius: 15px; }
+.exhaustedMessage > strong { font-size: 16px; color: #e1d4fc; display: block; line-height: 1.5; }
+.exhaustedMessage > p { font-size: 12px; line-height: 1.6; color: #aebbd4; margin: 9px 0 18px; }
+.exhaustedMessage .launchButton { font-size: 14px; min-height: 53px; }
+.exhaustedMessage .launchButton > svg { margin: 0; }
+.secondaryButton { display: inline-flex; gap: 11px; align-items: center; background: #b9a4eb15; border: 1px solid #b9a4eb55; color: #dfd4f4; border-radius: 13px; min-height: 51px; padding: 10px 17px; font-size: 13px; font-weight: 800; }
+.secondaryButton:hover { background: #b9a4eb25; }
+.setupNote { display: flex; gap: 14px; align-items: flex-start; background: #f4ce790a; border: 1px solid #f4ce7922; border-radius: 15px; max-width: 370px; padding: 20px; }
+.setupNote > svg { color: #f4ce79; margin-top: 2px; }
+.setupNote strong { color: #ead5a7; font-size: 14px; }
+.setupNote p { color: #a5adc3; font-size: 12px; line-height: 1.7; margin: 6px 0 0; }
+.loadingMessage { display: flex; align-items: center; gap: 13px; min-height: 68px; color: #c7cee0; font-size: 14px; }
+.loadingDots { display: flex; gap: 5px; }
+.loadingDots i { width: 5px; height: 5px; background: #f4ce79; border-radius: 50%; animation: loading-bounce 1s infinite; }
+.loadingDots i:nth-child(2) { animation-delay: .15s; }
+.loadingDots i:nth-child(3) { animation-delay: .3s; }
+.connectionError p { font-size: 13px; line-height: 1.7; color: #e6b9b1; max-width: 360px; }
+.hasIdea { padding: 25px 0 28px 13px; }
+.missionWrap { position: relative; width: 100%; max-width: 495px; margin: auto; z-index: 1; }
+.missionLoading { display: grid; place-items: center; width: 100%; min-height: 350px; }
+.missionLoading > div { width: min(100%, 360px); margin: 0 auto; }
+.missionOrbit { position: absolute; inset: -50px -35px; border: 1px dashed #a8b3d62b; border-radius: 50%; transform: rotate(-22deg); pointer-events: none; }
+.missionCard { position: relative; color: #252a41; background: #f8f2e5; border: 1px solid #fff9ed; border-radius: 21px; padding: 28px 30px 22px; box-shadow: 10px 11px 0 #a79ac54a, 0 25px 70px #070a1b26; }
+.missionCard::before { position: absolute; content: ''; width: 70px; height: 24px; background: #bda8e77a; transform: rotate(-7deg); top: -12px; left: calc(50% - 35px); backdrop-filter: blur(2px); clip-path: polygon(2% 0, 96% 2%, 100% 9%, 96% 20%, 100% 31%, 96% 41%, 99% 55%, 96% 66%, 99% 81%, 96% 100%, 0 97%, 4% 81%, 0 67%, 4% 51%, 0 36%, 3% 22%); }
+.missionTopline { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 20px; border-bottom: 1px dashed #292f4730; }
+.missionTopline > span { display: flex; align-items: center; gap: 7px; font-size: 8px; color: #7e817d; letter-spacing: 2px; font-weight: 900; }
+.missionTopline > svg { color: #8b92a3; }
+.statusDot { width: 5px; height: 5px; background: #68a68d; border-radius: 50%; }
+.missionCategory { display: inline-block; color: #71756e; background: #e6e6d8; border: 1px solid #d4d6c64d; font-size: 10px; line-height: 1.5; font-weight: 750; padding: 5px 10px; border-radius: 7px; margin-top: 22px; }
+.ideaMarkdown { margin: 18px 0 26px; font-size: 17px; line-height: 1.75; font-weight: 500; overflow-wrap: anywhere; }
+.ideaMarkdown p { margin: 0 0 12px; }
+.ideaMarkdown p:last-child { margin: 0; }
+.ideaMarkdown strong { font-weight: 900; color: #282b42; }
+.ideaMarkdown p:first-child > strong:first-child { display: block; font-size: 26px; line-height: 1.3; letter-spacing: -.6px; margin: 0 0 14px; }
+.ideaMarkdown > p:only-child { font-size: 19px; font-weight: 650; line-height: 1.7; }
+.ideaMarkdown a { color: #3f7d78; text-decoration-color: #80afa2; text-underline-offset: 4px; font-weight: 800; font-size: 14px; }
+.ideaMarkdown a:hover { color: #28524d; }
+.ideaMarkdown ul, .ideaMarkdown ol { padding-left: 22px; }
+.missionFooter { border-top: 1px dashed #292f4730; padding-top: 17px; display: flex; align-items: center; gap: 8px; color: #92907f; font-size: 10px; font-weight: 600; }
+.missionFooter > svg { color: #b98c86; }
+.missionSticker { position: absolute; right: -19px; top: -30px; z-index: 2; background: #b8a4e7; color: #353252; width: 92px; height: 92px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; font-size: 12px; font-weight: 900; transform: rotate(12deg); box-shadow: 0 5px 0 #7b6c9f; border: 2px solid #cfbef3; }
+.missionSticker > span { font-size: 14px; }
+.missionSticker svg { margin-top: 4px; }
+.cardTinyStar { position: absolute; bottom: -40px; left: 25px; color: #eaca7e; font-size: 30px; transform: rotate(-15deg); }
+.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.confetti i { position: absolute; left: 50%; top: 30%; width: 7px; height: 12px; background: #e9c66f; opacity: 0; border-radius: 2px; animation: confetti-pop .9s ease-out both; transform: rotate(var(--rotation)); }
+.confetti i:nth-child(3n) { background: #a6d8c9; border-radius: 50%; width: 8px; height: 8px; }
+.confetti i:nth-child(3n+1) { background: #b9a4e9; }
+.confetti i:nth-child(3n+2) { background: #eaa196; }
+.journeyStrip { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 127px; padding: 25px 32px; border: 1px solid #9aabd61e; border-radius: 20px; background: linear-gradient(110deg, #252d481f, #27334b1f); }
+.journeyItem { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.journeyIcon { width: 47px; height: 47px; display: grid; place-items: center; border-radius: 14px; flex-shrink: 0; }
+.journeyMint { color: #a4d5c5; background: #a4d5c50d; border: 1px solid #a4d5c51f; }
+.journeyYellow { color: #ecd28d; background: #ecd28d0d; border: 1px solid #ecd28d1f; }
+.journeyPink { color: #d6adc3; background: #d6adc30d; border: 1px solid #d6adc31f; }
+.journeyNumber { display: block; color: #7f8dac; font-size: 8px; font-weight: 800; letter-spacing: 1.7px; margin-bottom: 7px; }
+.journeyItem p { color: #ccd2e2; font-size: 12px; line-height: 1.4; font-weight: 750; margin: 0; }
+.journeyConnector { display: flex; align-items: center; gap: 2px; letter-spacing: 1px; color: #7885a349; font-size: 13px; margin: 0 6px; }
+.footer { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 26px 0 27px; font-size: 10px; color: #6f7d9b; }
+.footerSignature { display: inline-flex; align-items: center; gap: 7px; }
+.footerSignature svg { color: #a08fb5; }
+.srOnly { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+.skipLink { position: absolute; top: 15px; left: 15px; z-index: 100; transform: translateY(-200%); background: #f4ce79; color: #20253d; padding: 12px 20px; border-radius: 10px; font-weight: 800; }
+.skipLink:focus { transform: translateY(0); }
+.spinningIcon { animation: icon-spin 2s linear infinite; }
+@keyframes loading-bounce { 0%, 80%, 100% { transform: translateY(0); opacity: .4; } 40% { transform: translateY(-5px); opacity: 1; } }
+@keyframes icon-spin { to { transform: rotate(360deg); } }
+@keyframes confetti-pop { 0% { opacity: 0; transform: rotate(var(--rotation)) translateY(0) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--rotation)) translateY(calc(var(--distance) * -1)) rotate(160deg); } }
+
+@media (min-width: 1440px) { .pageShell { width: min(1240px, calc(100% - 140px)); } .main { min-height: 705px; padding-top: 76px; padding-bottom: 72px; } .heroTitle { font-size: 68px; } .heroDescription { font-size: 17px; max-width: 390px; } }
+@media (max-width: 1100px) { .pageShell { width: calc(100% - 72px); } .main { gap: 16px; min-height: 630px; } .heroTitle { font-size: 51px; letter-spacing: -2px; } .heroDescription { font-size: 15px; max-width: 340px; } .eyebrow { font-size: 8px; letter-spacing: 1.4px; } .sceneNote { right: -3%; font-size: 11px; padding: 13px 16px 13px 13px; } .journeyStrip { padding: 25px 23px; } .journeyConnector { font-size: 10px; margin: 0; max-width: 50px; overflow: hidden; } .journeyItem { gap: 11px; } .journeyItem p { font-size: 11px; } .journeyIcon { width: 41px; height: 43px; } .missionCard { padding: 25px; } .ideaMarkdown { font-size: 16px; } .ideaMarkdown p:first-child > strong:first-child { font-size: 24px; } }
+@media (max-width: 850px) { .pageShell { width: calc(100% - 48px); } .header { height: 95px; } .main { min-height: 615px; gap: 8px; } .heroTitle { font-size: 43px; letter-spacing: -1.8px; } .heroDescription { font-size: 14px; max-width: 315px; } .eyebrow { font-size: 7px; letter-spacing: 1.1px; gap: 6px; } .spaceScene { width: calc(100% + 40px); margin-left: -15px; } .heroFootnote { margin-top: 30px; } .headerActions { gap: 12px; } .userName { display: none; } .headerDivider { display: none; } .journeyConnector { display: none; } .journeyStrip { padding: 23px 18px; } .journeyIcon { width: 35px; height: 39px; border-radius: 11px; } .journeyIcon svg { width: 20px; height: 20px; } .journeyItem { gap: 9px; } .journeyNumber { font-size: 7px; letter-spacing: 1px; } .journeyItem p { font-size: 10px; } .sceneNote { right: -7%; font-size: 10px; padding: 10px 12px 10px 8px; } .noteStar { width: 25px; font-size: 27px; } .orbitLabel { font-size: 8px; } .missionSticker { width: 75px; height: 75px; top: -33px; right: -9px; font-size: 10px; } .missionSticker > span { font-size: 12px; } .missionCard { padding: 24px 20px 19px; border-radius: 17px; } .ideaMarkdown > p:only-child { font-size: 17px; } .ideaMarkdown p:first-child > strong:first-child { font-size: 22px; } .missionTopline > span { font-size: 7px; letter-spacing: 1.4px; } .hasIdea { padding-left: 14px; } .categoryMenu { width: max(100%, 350px); } .launchButton { font-size: 15px; } }
+@media (max-width: 680px) { .pageShell { width: calc(100% - 40px); max-width: 480px; } .header { height: 91px; gap: 12px; } .brand { font-size: 16px; gap: 10px; } .brandSecond { font-size: 23px; } .brandIcon { width: 42px; height: 42px; border-radius: 13px; } .brandIcon svg { width: 25px; height: 25px; } .headerActions { gap: 8px; } .soundButton { width: 40px; height: 40px; min-height: 40px; padding: 0; justify-content: center; } .soundButton span { display: none; } .signOutButton { width: 32px; height: 40px; } .main { display: flex; flex-direction: column; gap: 0; padding: 39px 0 38px; min-height: 0; } .heroCopy { width: 100%; text-align: center; } .eyebrow { justify-content: center; margin-bottom: 21px; font-size: 7px; letter-spacing: 1.3px; } .heroTitle { font-size: clamp(39px, 9.4vw, 53px); line-height: 1.14; letter-spacing: -1.8px; margin-bottom: 28px; } .heroDescription { max-width: 325px; margin: 0 auto 26px; font-size: 14px; line-height: 1.8; } .loginControls { align-items: center; } .googleButton { min-height: 57px; font-size: 14px; padding: 0 21px; } .loginHint { font-size: 10px; } .heroFootnote { display: none; } .visualStage { width: 100%; margin-top: 17px; min-height: 0; } .spaceScene { width: 100%; max-width: 400px; margin: 0 auto; } .sceneNote { right: 0; font-size: 10px; padding: 10px 13px 10px 10px; } .orbitLabel { left: 3%; top: 20%; font-size: 8px; } .rocketArtwork { width: 70%; left: 13%; } .stageCaption { margin: -5px 0 4px; } .stageCaption > span { font-size: 7px; } .stageCaption p { font-size: 10px; } .journeyStrip { flex-direction: column; align-items: stretch; padding: 17px 21px; gap: 0; border-radius: 16px; } .journeyItem { gap: 14px; padding: 14px 0; } .journeyItem:not(:last-child) { border-bottom: 1px solid #afbed816; } .journeyIcon { width: 39px; height: 39px; } .journeyItem > div { display: flex; align-items: center; justify-content: space-between; flex: 1; gap: 15px; } .journeyNumber { font-size: 7px; margin-bottom: 0; letter-spacing: .9px; } .journeyItem p { font-size: 10px; font-weight: 700; } .footer { flex-direction: column; gap: 12px; font-size: 9px; text-align: center; padding: 25px 0; } .footerSignature { font-size: 8px; } .pickerControls { margin: 0 auto; max-width: 355px; text-align: left; } .categoryPicker { margin-bottom: 17px; } .categoryTrigger { min-height: 64px; padding: 10px 14px 10px 12px; } .categoryMenu { width: 100%; text-align: left; padding: 12px; } .categoryOption { font-size: 10px; gap: 6px; padding-left: 5px; padding-right: 22px; } .categorySymbol { min-width: 23px; font-size: 22px; } .categoryMenuHeading { font-size: 12px; } .launchButton { min-height: 59px; font-size: 16px; } .drawHint { font-size: 9px; margin-top: 15px; } .hasIdea { padding: 0 9px 9px 0; margin-top: 60px; } .missionWrap { width: 100%; max-width: 400px; } .missionCard { text-align: left; padding: 25px 24px 21px; } .missionCategory { font-size: 9px; } .ideaMarkdown > p:only-child { font-size: 18px; } .ideaMarkdown p:first-child > strong:first-child { font-size: 25px; } .missionSticker { right: -3px; top: -32px; width: 80px; height: 80px; } .missionFooter { font-size: 9px; } .missionOrbit { inset: -30px -10px; } .cardTinyStar { bottom: -36px; left: 20px; font-size: 23px; } .setupNote { text-align: left; margin: 0 auto; max-width: 340px; padding: 17px; } .setupNote p { font-size: 11px; } .secondaryButton { font-size: 12px; } .loadingMessage { justify-content: center; } .connectionError p { margin: 0 auto 15px; } .errorMessage { text-align: left; } .exhaustedMessage { text-align: left; } }
+@media (max-width: 370px) { .pageShell { width: calc(100% - 32px); } .eyebrow { font-size: 6px; letter-spacing: 1px; } .journeyStrip { padding: 12px 16px; } .journeyItem > div { display: block; } .journeyNumber { margin-bottom: 5px; } .heroTitle { font-size: 38px; } .brand { gap: 8px; } .brandIcon { width: 37px; height: 37px; } .brandSecond { font-size: 21px; } .brand { font-size: 15px; } .headerActions { gap: 4px; } .missionCard { padding: 24px 20px 19px; } }

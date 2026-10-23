@@ -1,0 +1,17 @@
+@import '@fontsource-variable/nunito';
+
+:root { font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif; color: #f9f5ea; background: #151b35; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { min-width: 320px; scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button, a, summary, input { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+a { color: inherit; }
+button, a, summary, input { outline-offset: 6px; }
+:focus-visible { outline: 3px solid #f4ce79; }
+button:focus:not(:focus-visible) { outline: none; }
+::selection { background: #b8a4ed; color: #161b35; }
+svg { display: block; flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

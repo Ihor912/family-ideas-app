@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInWithGoogle() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function isMember() {
+      return signedInWithGoogle()
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.active == true;
+    }
+
+    function validDrawState() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['seenIds', 'lastIdeaId', 'updatedAt'])
+        && data.keys().hasOnly(['seenIds', 'lastIdeaId', 'updatedAt'])
+        && data.seenIds is list
+        && data.seenIds.size() <= 1000
+        && data.seenIds.toSet().size() == data.seenIds.size()
+        && data.seenIds.join(',').matches('^([0-9a-f]{32}(,[0-9a-f]{32})*)?$')
+        && (data.seenIds.size() == 0
+          || data.seenIds.join(',').size() == data.seenIds.size() * 33 - 1)
+        && (data.lastIdeaId == null
+          ? data.seenIds.size() == 0
+          : (data.lastIdeaId is string
+            && data.lastIdeaId.matches('^[0-9a-f]{32}$')
+            && data.seenIds.size() > 0
+            && data.lastIdeaId == data.seenIds[data.seenIds.size() - 1]))
+        && data.updatedAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    match /members/{uid} {
+      allow get: if signedInWithGoogle() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    match /content/current {
+      allow get: if isMember();
+      allow list, create, update, delete: if false;
+    }
+
+    match /draws/current {
+      allow get: if isMember();
+      allow create, update: if isMember() && validDrawState();
+      allow list, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

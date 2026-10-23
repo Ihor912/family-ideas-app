@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.firebase/
+*-debug.log
+*.local
+.env*
+!.env.example
+Idei_dlya_simeinoho_dozvillia_bez_povtoriv.md
+private/
+*service-account*.json
+*adminsdk*.json
+.DS_Store
+*.tsbuildinfo
