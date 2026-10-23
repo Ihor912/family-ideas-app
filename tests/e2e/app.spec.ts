@@ -81,6 +81,8 @@ test('a failed draw offers retry without consuming progress', async ({ page }) =
 test('keyboard and reduced-motion experience remain usable without horizontal overflow', async ({ page, isMobile }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('./');
+  // Vite's dynamic app bootstrap can finish after the document load event.
+  await expect(page.getByRole('button', { name: 'Знайти пригоду', exact: true })).toBeEnabled();
   // Mobile Safari does not include links in its default hardware-Tab sequence.
   if (isMobile) await page.getByRole('link', { name: 'До пригоди' }).focus();
   else await page.keyboard.press('Tab');
