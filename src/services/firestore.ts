@@ -10,11 +10,11 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { parseCatalog } from '../domain/catalog';
-import { selectIdea } from '../domain/selection';
+import { resetSeenHistory, selectIdea } from '../domain/selection';
 import type { Catalog, DrawState } from '../domain/types';
 import type { AppServices, FamilySnapshot } from './types';
 
-export type FamilyServices = Pick<AppServices, 'subscribeFamily' | 'drawIdea'>;
+export type FamilyServices = Pick<AppServices, 'subscribeFamily' | 'drawIdea' | 'resetHistory'>;
 
 const emptyHistory = (): DrawState => ({ seenIds: [], lastIdeaId: null });
 const emptySnapshot = (status: FamilySnapshot['status']): FamilySnapshot => ({ status, catalog: null, history: null });
@@ -144,6 +144,24 @@ export function createFamilyServices(app: FirebaseApp, getUserId: () => string |
     return result.kind === 'drawn'
       ? { ...result, drawId: crypto.randomUUID() }
       : result;
+  },
+  async resetHistory(categoryId) {
+    const requestingUserId = getUserId();
+    if (!requestingUserId) throw new Error('Sign in before resetting family progress.');
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw Object.assign(new Error('Offline'), { code: 'unavailable' });
+    }
+    const contentRef = doc(db, 'content', 'current');
+    const historyRef = doc(db, 'draws', 'current');
+    await runTransaction(db, async (transaction) => {
+      if (getUserId() !== requestingUserId) throw new Error('The signed-in account changed.');
+      const [content, progress] = await Promise.all([
+        transaction.get(contentRef),
+        transaction.get(historyRef),
+      ]);
+      const next = resetSeenHistory(parseCatalog(content.data()), readHistory(progress.data()), categoryId);
+      transaction.set(historyRef, { ...next, updatedAt: serverTimestamp() });
+    });
   },
   };
 }

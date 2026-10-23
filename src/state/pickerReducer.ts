@@ -1,6 +1,6 @@
 import type { Catalog, Idea } from '../domain/types';
 
-export type PickerPhase = 'idle' | 'drawing' | 'revealing' | 'result' | 'exhausted' | 'empty' | 'error';
+export type PickerPhase = 'idle' | 'drawing' | 'revealing' | 'result' | 'resetting' | 'reset' | 'exhausted' | 'empty' | 'error';
 export type PickerState = {
   phase: PickerPhase;
   idea: Idea | null;
@@ -14,6 +14,9 @@ export type PickerAction =
   | { type: 'DRAW_EXHAUSTED'; catalog: Catalog }
   | { type: 'DRAW_EMPTY'; catalog: Catalog }
   | { type: 'DRAW_FAILED'; message: string }
+  | { type: 'RESET_STARTED' }
+  | { type: 'RESET_COMMITTED' }
+  | { type: 'RESET_FAILED'; message: string }
   | { type: 'REVEAL_FINISHED' }
   | { type: 'CLEAR' };
 
@@ -30,7 +33,12 @@ export function pickerReducer(state: PickerState, action: PickerAction): PickerS
     case 'DRAW_EMPTY':
       return { ...initialPickerState, phase: 'empty', catalog: action.catalog };
     case 'DRAW_FAILED':
+    case 'RESET_FAILED':
       return { ...state, phase: 'error', error: action.message };
+    case 'RESET_STARTED':
+      return { ...state, phase: 'resetting', error: null };
+    case 'RESET_COMMITTED':
+      return { ...initialPickerState, phase: 'reset' };
     case 'REVEAL_FINISHED':
       return state.phase === 'revealing' ? { ...state, phase: 'result' } : state;
     case 'CLEAR':

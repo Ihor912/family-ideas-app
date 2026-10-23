@@ -83,6 +83,23 @@
 .launchButton:disabled { opacity: .7; box-shadow: 0 3px 0 #a88b54; }
 .drawHint { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 10px; color: #8e9db9; margin: 16px 0 0; }
 .hintDot { width: 4px; height: 4px; background: #8fc7b7; border-radius: 100%; }
+
+.resetHistory { margin-top: 8px; }
+.resetButton { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 10px 14px; margin: 0 auto; color: #b9afd4; background: transparent; border: 1px solid transparent; border-radius: 10px; font-size: 12px; font-weight: 750; }
+.resetButton:hover:not(:disabled), .resetButton[aria-expanded='true'] { color: #e7dcff; background: #b9a4eb15; border-color: #b9a4eb36; }
+.resetButton:disabled { opacity: .45; }
+.resetPanel { margin-top: 8px; padding: 18px; border: 1px solid #b9a4eb50; border-radius: 15px; background: #242b45; box-shadow: 0 12px 30px #090d2026; }
+.resetPanel h2 { margin: 0; color: #e4d7fc; font-size: 16px; font-weight: 850; }
+.resetPanel p { margin: 9px 0 16px; color: #bdc5da; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.resetActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.resetCancel, .resetConfirm { flex: 1 1 120px; min-height: 44px; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; }
+.resetCancel { color: #d9deed; border: 1px solid #99a8ca50; background: #ffffff05; }
+.resetCancel:hover { background: #ffffff0c; }
+.resetConfirm { color: #29253c; border: 1px solid #cbb5f0; background: #cbb5f0; }
+.resetConfirm:hover { background: #ddcafa; }
+.resetSuccess { display: flex; align-items: flex-start; gap: 8px; color: #b0dfcf; font-size: 12px; line-height: 1.6; margin: 10px 0 0; }
+.resetSuccess svg { flex-shrink: 0; margin-top: 2px; }
+
 .errorMessage { border-left: 2px solid #efaaa2; padding-left: 12px; color: #efbcb4; font-size: 12px; line-height: 1.6; max-width: 380px; margin: 20px 0 0; }
 .exhaustedMessage { background: #b8a4ed0d; border: 1px solid #b8a4ed22; padding: 18px; border-radius: 15px; }
 .exhaustedMessage > strong { font-size: 16px; color: #e1d4fc; display: block; line-height: 1.5; }

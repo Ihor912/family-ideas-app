@@ -25,4 +25,5 @@ export interface AppServices {
     error: (error: unknown) => void,
   ): () => void;
   drawIdea(categoryId: string, reset: boolean): Promise<DrawResult>;
+  resetHistory(categoryId: string): Promise<void>;
 }

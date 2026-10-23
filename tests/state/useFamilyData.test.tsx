@@ -29,6 +29,7 @@ function setup() {
       return unsubscribe;
     },
     drawIdea: async () => { throw new Error('unused'); },
+    resetHistory: async () => undefined,
   };
   const wrapper = ({ children }: { children: ReactNode }) => <AuthProvider services={services}>{children}</AuthProvider>;
   return { ...renderHook(({ currentUser }) => useFamilyData(currentUser), { initialProps: { currentUser: user as FamilyUser | null }, wrapper }), listeners };

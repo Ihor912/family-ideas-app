@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Category } from '../domain/types';
 import { ALL_CATEGORIES } from '../domain/types';
 import { Icon } from './Icons';
@@ -12,6 +12,9 @@ function categoryPresentation(category?: Category, index = 0) {
 
 export function CategoryPicker({ categories, selectedId, disabled, onChange }: { categories: Category[]; selectedId: string; disabled: boolean; onChange: (id: string) => void }) {
   const details = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (disabled) details.current?.removeAttribute('open');
+  }, [disabled]);
   const selected = categories.find(category => category.id === selectedId);
   const selectedLook = categoryPresentation(selected, categories.findIndex(category => category.id === selectedId) + 1);
   const options = [{ id: ALL_CATEGORIES, name: 'Усі пригоди', count: 0 }, ...categories];

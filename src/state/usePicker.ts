@@ -59,6 +59,26 @@ export function usePicker(userId: string | null) {
     }
   }, [userId, services, prepareAudio, play, stopSounds]);
 
+  const resetHistory = useCallback(async (categoryId: string) => {
+    if (!userId || pending.current || !mounted.current) return;
+    pending.current = true;
+    activeReveal.current = null;
+    const request = ++generation.current;
+    stopSounds();
+    dispatch({ type: 'RESET_STARTED' });
+
+    try {
+      await services.resetHistory(categoryId);
+      if (!mounted.current || request !== generation.current) return;
+      pending.current = false;
+      dispatch({ type: 'RESET_COMMITTED' });
+    } catch (reason) {
+      if (!mounted.current || request !== generation.current) return;
+      pending.current = false;
+      dispatch({ type: 'RESET_FAILED', message: errorMessage(reason, 'Не вдалося скинути історію. Спробуйте ще раз.') });
+    }
+  }, [userId, services, stopSounds]);
+
   const finishReveal = useCallback(() => {
     if (state.phase !== 'revealing' || !state.drawId || activeReveal.current !== state.drawId) return;
     activeReveal.current = null;
@@ -79,9 +99,10 @@ export function usePicker(userId: string | null) {
   return {
     ...state,
     status: state.phase,
-    busy: state.phase === 'drawing' || state.phase === 'revealing',
+    busy: state.phase === 'drawing' || state.phase === 'revealing' || state.phase === 'resetting',
     draw,
     reset,
+    resetHistory,
     clear,
     finishReveal,
   };

@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { parseCatalog, toStructuredContent } from '../../src/domain/catalog';
-import { selectIdea } from '../../src/domain/selection';
+import { resetSeenHistory, selectIdea } from '../../src/domain/selection';
 import { ALL_CATEGORIES, type ContentDocument, type DrawState, type LegacyContentDocument } from '../../src/domain/types';
 
 const sampleContent: ContentDocument = {
@@ -202,6 +202,68 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)('Firestore authorization a
     const history = await getDoc(doc(google('alice'), 'draws/current'));
     expect(history.data()?.seenIds).toHaveLength(3);
     expect(new Set(history.data()?.seenIds)).toEqual(new Set([otherIdea.id, ...results]));
+  });
+
+  it('resets category progress without drawing, keeps other categories, and can clear All', async () => {
+    const catalog = parseCatalog(sampleContent);
+    const categoryId = catalog.categories[0]!.id;
+    const selectedIdea = catalog.ideas.find((idea) => idea.categoryId === categoryId)!;
+    const otherIdea = catalog.ideas.find((idea) => idea.categoryId !== categoryId)!;
+    const db = google('alice');
+    await setDoc(doc(db, 'draws/current'), {
+      seenIds: [otherIdea.id, selectedIdea.id], lastIdeaId: selectedIdea.id, updatedAt: serverTimestamp(),
+    });
+    const reset = (target: string) => runTransaction(db, async (transaction) => {
+      const [content, history] = await Promise.all([
+        transaction.get(doc(db, 'content/current')),
+        transaction.get(doc(db, 'draws/current')),
+      ]);
+      const next = resetSeenHistory(parseCatalog(content.data()), history.data() as DrawState, target);
+      transaction.set(doc(db, 'draws/current'), { ...next, updatedAt: serverTimestamp() });
+    });
+
+    await assertSucceeds(reset(categoryId));
+    const categoryHistory = await getDoc(doc(google('bob'), 'draws/current'));
+    expect(categoryHistory.data()).toMatchObject({ seenIds: [otherIdea.id], lastIdeaId: otherIdea.id });
+    await assertSucceeds(reset(ALL_CATEGORIES));
+    const allHistory = await getDoc(doc(google('bob'), 'draws/current'));
+    expect(allHistory.data()).toMatchObject({ seenIds: [], lastIdeaId: null });
+  });
+
+  it('retries a standalone reset against concurrent history changes without losing another category draw', async () => {
+    const catalog = parseCatalog(sampleContent);
+    const categoryId = catalog.categories[0]!.id;
+    const selectedIdea = catalog.ideas.find((idea) => idea.categoryId === categoryId)!;
+    const otherIdea = catalog.ideas.find((idea) => idea.categoryId !== categoryId)!;
+    const db = google('alice');
+    await setDoc(doc(db, 'draws/current'), {
+      seenIds: [selectedIdea.id], lastIdeaId: selectedIdea.id, updatedAt: serverTimestamp(),
+    });
+    let firstRead!: () => void;
+    let releaseFirstAttempt!: () => void;
+    const read = new Promise<void>((resolve) => { firstRead = resolve; });
+    const release = new Promise<void>((resolve) => { releaseFirstAttempt = resolve; });
+    let attempts = 0;
+    const reset = runTransaction(db, async (transaction) => {
+      const [content, history] = await Promise.all([
+        transaction.get(doc(db, 'content/current')),
+        transaction.get(doc(db, 'draws/current')),
+      ]);
+      attempts += 1;
+      if (attempts === 1) { firstRead(); await release; }
+      const next = resetSeenHistory(parseCatalog(content.data()), history.data() as DrawState, categoryId);
+      transaction.set(doc(db, 'draws/current'), { ...next, updatedAt: serverTimestamp() });
+    });
+    await read;
+    try {
+      await setDoc(doc(google('bob'), 'draws/current'), {
+        seenIds: [selectedIdea.id, otherIdea.id], lastIdeaId: otherIdea.id, updatedAt: serverTimestamp(),
+      });
+    } finally { releaseFirstAttempt(); }
+    await assertSucceeds(reset);
+    expect(attempts).toBeGreaterThan(1);
+    const history = await getDoc(doc(db, 'draws/current'));
+    expect(history.data()).toMatchObject({ seenIds: [otherIdea.id], lastIdeaId: otherIdea.id });
   });
 
   it('preserves seen IDs across a structured migration and later wording edits', async () => {

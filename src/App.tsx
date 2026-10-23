@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { ALL_CATEGORIES } from './domain/types';
 import type { AppServices } from './services/types';
@@ -8,6 +8,7 @@ import { SoundProvider } from './state/SoundContext';
 import { useSound } from './state/soundState';
 import { useFamilyData } from './state/useFamilyData';
 import { usePicker } from './state/usePicker';
+import { ResetHistory } from './components/ResetHistory';
 import { CategoryPicker } from './components/CategoryPicker';
 import { GoogleMark, Icon } from './components/Icons';
 import { SpaceScene } from './components/SpaceScene';
@@ -27,6 +28,9 @@ function FamilyOrbit() {
   const picker = usePicker(family.status === 'ready' ? auth.user?.uid ?? null : null);
   const reduceMotion = useReducedMotion();
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
+  const [resetTarget, setResetTarget] = useState<{ userId: string; categoryId: string } | null>(null);
+  const launchButton = useRef<HTMLButtonElement>(null);
+  const resetNeedsFocus = useRef(false);
   const categoryId = family.catalog?.categories.some(category => category.id === selectedCategory) ? selectedCategory : ALL_CATEGORIES;
   const categories = family.catalog?.categories ?? [];
   const pool = family.catalog?.ideas.filter(idea => categoryId === ALL_CATEGORIES || idea.categoryId === categoryId) ?? [];
@@ -37,6 +41,8 @@ function FamilyOrbit() {
   const showIdea = ready && picker.idea && !['drawing', 'exhausted', 'empty'].includes(picker.phase);
   const isExhausted = ready && picker.phase === 'exhausted';
   const busy = picker.busy;
+  const confirmingReset = ready && resetTarget?.userId === auth.user?.uid && resetTarget?.categoryId === categoryId;
+  const controlsLocked = busy || confirmingReset;
   const selectedIdeaCategory = categories.find(item => item.id === picker.idea?.categoryId);
   const firstName = auth.user?.displayName?.split(' ')[0];
 
@@ -46,7 +52,20 @@ function FamilyOrbit() {
     return () => window.clearTimeout(timer);
   }, [picker.phase, picker.finishReveal, reduceMotion]);
 
+  // Close a confirmation if its account or category is no longer active.
+  if (resetTarget && (!ready || resetTarget.userId !== auth.user?.uid || resetTarget.categoryId !== categoryId)) {
+    setResetTarget(null);
+  }
+
+  useEffect(() => {
+    if (resetNeedsFocus.current && !busy) {
+      resetNeedsFocus.current = false;
+      launchButton.current?.focus();
+    }
+  }, [busy, picker.phase, confirmingReset]);
+
   function draw(reset = false) {
+    if (controlsLocked) return;
     sound.prepareAudio();
     // Warm the renderer while the shared draw commits; a failed preload can retry on render.
     void loadIdeaCard().catch(() => undefined);
@@ -54,6 +73,8 @@ function FamilyOrbit() {
   }
 
   function changeCategory(id: string) {
+    if (controlsLocked) return;
+    setResetTarget(null);
     picker.clear();
     sound.prepareAudio();
     sound.play('plink');
@@ -68,7 +89,7 @@ function FamilyOrbit() {
         <a className={styles.brand} href={import.meta.env.BASE_URL} aria-label="Сімейна орбіта — головна"><span className={styles.brandIcon}><Icon name="planet" size={27} /></span><span>сімейна<span className={styles.brandSecond}>орбіта<span className={styles.brandDot}>.</span></span></span></a>
         <div className={styles.headerActions}>
           <button type="button" className={`${styles.soundButton} ${sound.soundEnabled ? styles.soundOn : ''}`} aria-pressed={sound.soundEnabled} aria-label={sound.soundEnabled ? 'Звук: увімкнено. Вимкнути звук' : 'Звук: вимкнено. Увімкнути звук'} onClick={sound.toggleSound}><Icon name={sound.soundEnabled ? 'sound' : 'muted'} size={19} /><span>Звук {sound.soundEnabled ? 'увімкнено' : 'вимкнено'}</span></button>
-          {auth.status === 'signed-in' && <><span className={styles.headerDivider} /><span className={styles.userName}>{firstName ? `Привіт, ${firstName}!` : 'Привіт, досліднику!'}</span><button type="button" className={styles.signOutButton} onClick={() => { sound.stopSounds(); void auth.signOut(); }} aria-label="Вийти з облікового запису" title="Вийти"><Icon name="logout" size={19} /></button></>}
+          {auth.status === 'signed-in' && <><span className={styles.headerDivider} /><span className={styles.userName}>{firstName ? `Привіт, ${firstName}!` : 'Привіт, досліднику!'}</span><button type="button" className={styles.signOutButton} onClick={() => { setResetTarget(null); sound.stopSounds(); void auth.signOut(); }} aria-label="Вийти з облікового запису" title="Вийти"><Icon name="logout" size={19} /></button></>}
         </div>
       </header>
 
@@ -88,11 +109,25 @@ function FamilyOrbit() {
             <p className={styles.heroDescription}>{ready ? 'Відкладіть справи. Зберіть екіпаж. Наступна маленька пригода вже чекає на вас.' : 'Трохи магії, одна кнопка — і звичайний день перетворюється на пригоду для всієї сім’ї.'}</p>
 
             {ready ? <div className={styles.pickerControls}>
-              <CategoryPicker categories={categories} selectedId={categoryId} disabled={busy} onChange={changeCategory} />
-              {isExhausted ? <div className={styles.exhaustedMessage}><strong>Цей куточок космосу вже досліджено!</strong><p>{categoryId === ALL_CATEGORIES ? 'Ви відкрили всі ідеї. Почнімо нове коло сімейних пригод?' : 'Усі ідеї цього напрямку вже відкриті. Почнімо його спочатку?'}</p><button type="button" className={styles.launchButton} onClick={() => draw(true)}><Icon name="refresh" size={21} />Почати нове коло</button></div> : <>
-                <motion.button type="button" className={styles.launchButton} disabled={busy || pool.length === 0} onClick={() => draw()} whileHover={reduceMotion || busy ? {} : { y: -3 }} whileTap={reduceMotion || busy ? {} : { scale: .97 }}><Icon name={busy ? 'planet' : 'spark'} size={23} className={busy ? styles.spinningIcon : ''} /><span>{picker.phase === 'drawing' ? 'Шукаємо пригоду…' : picker.phase === 'revealing' ? 'Ось вона, пригода!' : picker.idea ? 'Ще одну пригоду!' : 'Знайти пригоду'}</span>{!busy && <Icon name="arrow" size={22} />}</motion.button>
+              <CategoryPicker categories={categories} selectedId={categoryId} disabled={controlsLocked} onChange={changeCategory} />
+              {isExhausted ? <div className={styles.exhaustedMessage}><strong>Цей куточок космосу вже досліджено!</strong><p>{categoryId === ALL_CATEGORIES ? 'Ви відкрили всі ідеї. Почнімо нове коло сімейних пригод?' : 'Усі ідеї цього напрямку вже відкриті. Почнімо його спочатку?'}</p><button type="button" className={styles.launchButton} disabled={controlsLocked} onClick={() => draw(true)}><Icon name="refresh" size={21} />Почати нове коло</button></div> : <>
+                <motion.button ref={launchButton} type="button" className={styles.launchButton} disabled={controlsLocked || pool.length === 0} onClick={() => draw()} whileHover={reduceMotion || controlsLocked ? {} : { y: -3 }} whileTap={reduceMotion || controlsLocked ? {} : { scale: .97 }}><Icon name={busy ? 'planet' : 'spark'} size={23} className={busy ? styles.spinningIcon : ''} /><span>{picker.phase === 'resetting' ? 'Скидаємо історію…' : picker.phase === 'drawing' ? 'Шукаємо пригоду…' : picker.phase === 'revealing' ? 'Ось вона, пригода!' : picker.idea ? 'Ще одну пригоду!' : 'Знайти пригоду'}</span>{!busy && <Icon name="arrow" size={22} />}</motion.button>
                 <p className={styles.drawHint}>{pool.length === 0 ? 'У цьому напрямку поки немає ідей.' : <><span className={styles.hintDot} />{remaining} з {pool.length} ідей ще чекають на вас</>}</p>
               </>}
+              <ResetHistory open={confirmingReset} busy={busy} canReset={remaining < pool.length}
+                categoryName={categoryId === ALL_CATEGORIES ? null : categories.find(item => item.id === categoryId)?.name ?? null}
+                onRequest={() => { if (auth.user && !busy) setResetTarget({ userId: auth.user.uid, categoryId }); }}
+                onCancel={() => {
+                  resetNeedsFocus.current = remaining === pool.length;
+                  setResetTarget(null);
+                }}
+                onConfirm={() => {
+                  if (!confirmingReset || busy) return;
+                  resetNeedsFocus.current = true;
+                  setResetTarget(null);
+                  void picker.resetHistory(categoryId);
+                }} />
+              {picker.phase === 'reset' && <p className={styles.resetSuccess} role="status"><Icon name="check" size={17} />Історію скинуто. Можна починати нове коло!</p>}
               {picker.error && <p className={styles.errorMessage} role="alert">{picker.error}</p>}
             </div> : isLoading ? <div className={styles.loadingMessage} role="status"><span className={styles.loadingDots}><i /><i /><i /></span>Готуємо ваш космодром…</div> : family.status === 'error' && auth.status === 'signed-in' ? <div className={styles.connectionError} role="alert"><p>{family.error || 'Зв’язок із космодромом перервався. Спробуймо ще раз.'}</p><button type="button" className={styles.secondaryButton} onClick={family.retry}><Icon name="refresh" size={18} /> Спробувати ще раз</button></div> : <div className={styles.loginControls}>
               <button type="button" className={styles.googleButton} onClick={() => void auth.signIn()}><GoogleMark /><span>Увійти з Google</span><Icon name="arrow" size={20} /></button>

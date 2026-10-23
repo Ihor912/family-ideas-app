@@ -1,5 +1,5 @@
 import { parseCatalog } from '../domain/catalog';
-import { selectIdea } from '../domain/selection';
+import { resetSeenHistory, selectIdea } from '../domain/selection';
 import type { DrawState } from '../domain/types';
 import type { AppServices, FamilySnapshot, FamilyUser } from '../services/types';
 
@@ -34,7 +34,9 @@ const exampleMarkdown = `# Тестова експедиція
 `;
 
 export function createDemoServices(): AppServices {
-  const scenario = new URLSearchParams(window.location.search).get('scenario');
+  const params = new URLSearchParams(window.location.search);
+  const scenario = params.get('scenario');
+  let failNextReset = scenario === 'reset-error' || params.get('failResetOnce') === '1';
   const catalog = parseCatalog({ markdown: scenario === 'empty' ? '# Порожньо' : exampleMarkdown, excludedSections: [] });
   const demoUser: FamilyUser = { uid: 'demo-adult', displayName: 'Капітан', email: null, photoURL: null };
   let user: FamilyUser | null = scenario === 'signed-out' ? null : demoUser;
@@ -60,6 +62,18 @@ export function createDemoServices(): AppServices {
       history = result.state;
       familyListeners.forEach((listener) => listener(snapshot()));
       return { ...result, drawId: crypto.randomUUID() };
+    },
+    async resetHistory(categoryId) {
+      const requestingUserId = user?.uid;
+      if (!requestingUserId) throw new Error('Sign in before resetting family progress.');
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      if (user?.uid !== requestingUserId) throw new Error('The signed-in account changed.');
+      if (scenario === 'error' || failNextReset) {
+        failNextReset = false;
+        throw new Error('Тестова помилка скидання прогресу');
+      }
+      history = resetSeenHistory(catalog, history, categoryId);
+      familyListeners.forEach((listener) => listener(snapshot()));
     },
   };
 }

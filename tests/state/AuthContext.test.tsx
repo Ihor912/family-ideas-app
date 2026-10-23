@@ -19,6 +19,7 @@ function setup(signIn: AppServices['signIn'] = async () => undefined) {
     signOut: vi.fn(async () => authChanged(null)),
     subscribeFamily: () => () => undefined,
     drawIdea: async () => { throw new Error('unused'); },
+    resetHistory: async () => undefined,
   };
   const wrapper = ({ children }: { children: ReactNode }) => <AuthProvider services={services}>{children}</AuthProvider>;
   return { ...renderHook(useAuth, { wrapper }), services, authChanged: (user: FamilyUser | null) => authChanged(user), unsubscribe };

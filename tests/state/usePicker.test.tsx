@@ -22,7 +22,7 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-function setup(drawIdea: AppServices['drawIdea']) {
+function setup(drawIdea: AppServices['drawIdea'], resetHistory: AppServices['resetHistory'] = vi.fn(async () => undefined)) {
   const services: AppServices = {
     configured: true,
     subscribeAuth(next) { next({ uid: 'adult', displayName: null, email: null, photoURL: null }); return () => undefined; },
@@ -30,6 +30,7 @@ function setup(drawIdea: AppServices['drawIdea']) {
     signOut: vi.fn(async () => undefined),
     subscribeFamily: () => () => undefined,
     drawIdea,
+    resetHistory,
   };
   const wrapper = ({ children }: { children: ReactNode }) => (
     <StrictMode><AuthProvider services={services}><SoundProvider>{children}</SoundProvider></AuthProvider></StrictMode>
@@ -112,5 +113,87 @@ describe('usePicker', () => {
     act(() => { void hook.current.draw('all'); oldCompletion(); void hook.current.draw('all'); });
     expect(drawIdea).toHaveBeenCalledTimes(2);
     await act(async () => next.resolve({ ...result, drawId: 'draw-2' }));
+  });
+
+  it('clears the preceding card after a standalone reset without drawing or playing a reveal', async () => {
+    const resetHistory = vi.fn<AppServices['resetHistory']>().mockResolvedValue(undefined);
+    const drawIdea = vi.fn<AppServices['drawIdea']>().mockResolvedValue(result);
+    const { result: hook } = setup(drawIdea, resetHistory);
+    await act(async () => hook.current.draw('all'));
+    act(() => hook.current.finishReveal());
+    vi.mocked(audioEngine.play).mockClear();
+
+    await act(async () => hook.current.resetHistory(idea.categoryId));
+
+    expect(resetHistory).toHaveBeenCalledWith(idea.categoryId);
+    expect(drawIdea).toHaveBeenCalledTimes(1);
+    expect(hook.current).toMatchObject({ phase: 'reset', idea: null, drawId: null, error: null, busy: false });
+    expect(audioEngine.play).not.toHaveBeenCalled();
+    await act(async () => hook.current.draw('all'));
+    expect(drawIdea).toHaveBeenCalledTimes(2);
+    expect(hook.current.phase).toBe('revealing');
+  });
+
+  it('shares the pending lock between standalone reset, draw, and reveal', async () => {
+    const selection = deferred<DrawResult>();
+    const reset = deferred<void>();
+    const drawIdea = vi.fn(() => selection.promise);
+    const resetHistory = vi.fn(() => reset.promise);
+    const { result: hook } = setup(drawIdea, resetHistory);
+    act(() => { void hook.current.draw('all'); void hook.current.resetHistory('all'); });
+    expect(resetHistory).not.toHaveBeenCalled();
+    await act(async () => selection.resolve(result));
+    const oldCompletion = hook.current.finishReveal;
+    act(() => { void hook.current.resetHistory('all'); });
+    expect(resetHistory).not.toHaveBeenCalled();
+    act(() => hook.current.finishReveal());
+
+    act(() => {
+      void hook.current.resetHistory('all');
+      oldCompletion();
+      void hook.current.draw('all');
+      void hook.current.reset('all');
+      void hook.current.resetHistory('all');
+    });
+    expect(hook.current).toMatchObject({ phase: 'resetting', idea, busy: true });
+    expect(resetHistory).toHaveBeenCalledTimes(1);
+    expect(drawIdea).toHaveBeenCalledTimes(1);
+    await act(async () => reset.resolve());
+    expect(hook.current).toMatchObject({ phase: 'reset', busy: false });
+  });
+
+  it('retains the previous card after a failed reset and permits a retry', async () => {
+    const resetHistory = vi.fn<AppServices['resetHistory']>()
+      .mockRejectedValueOnce({ code: 'unavailable' })
+      .mockResolvedValueOnce(undefined);
+    const { result: hook } = setup(async () => result, resetHistory);
+    await act(async () => hook.current.draw('all'));
+    act(() => hook.current.finishReveal());
+    await act(async () => hook.current.resetHistory('all'));
+    expect(hook.current).toMatchObject({ phase: 'error', idea, busy: false });
+    expect(hook.current.error).toContain('інтернет');
+    await act(async () => hook.current.resetHistory('all'));
+    expect(hook.current).toMatchObject({ phase: 'reset', idea: null, error: null });
+    expect(resetHistory).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['success', 'failure'] as const)('ignores a late reset %s after the user changes', async (outcome) => {
+    const reset = deferred<void>();
+    const selection = deferred<DrawResult>();
+    const drawIdea = vi.fn(() => selection.promise);
+    const { result: hook, rerender } = setup(drawIdea, () => reset.promise);
+    act(() => { void hook.current.resetHistory('all'); });
+    rerender({ uid: null });
+    expect(hook.current).toMatchObject({ phase: 'idle', idea: null });
+    rerender({ uid: 'another-adult' });
+    act(() => { void hook.current.draw('all'); });
+    await act(async () => {
+      if (outcome === 'success') reset.resolve();
+      else reset.reject({ code: 'unavailable' });
+    });
+    expect(hook.current).toMatchObject({ phase: 'drawing', busy: true, error: null });
+    act(() => { void hook.current.draw('all'); });
+    expect(drawIdea).toHaveBeenCalledTimes(1);
+    await act(async () => selection.resolve(result));
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { selectIdea } from '../../src/domain/selection';
+import { resetSeenHistory, selectIdea } from '../../src/domain/selection';
 import { ALL_CATEGORIES, type Catalog, type DrawState } from '../../src/domain/types';
 
 const catalog: Catalog = {
@@ -14,6 +14,32 @@ const catalog: Catalog = {
   ],
 };
 const emptyState: DrawState = { seenIds: [], lastIdeaId: null };
+
+describe('resetSeenHistory', () => {
+  it('clears a partially explored category without drawing or altering other categories', () => {
+    const state: DrawState = { seenIds: ['c', 'a'], lastIdeaId: 'a' };
+    expect(resetSeenHistory(catalog, state, 'space')).toEqual({ seenIds: ['c'], lastIdeaId: 'c' });
+    expect(state).toEqual({ seenIds: ['c', 'a'], lastIdeaId: 'a' });
+  });
+
+  it('clears all progress from All and keeps an already empty history empty', () => {
+    expect(resetSeenHistory(catalog, { seenIds: ['a', 'c'], lastIdeaId: 'c' }, ALL_CATEGORIES)).toEqual(emptyState);
+    expect(resetSeenHistory(catalog, emptyState, 'space')).toEqual(emptyState);
+  });
+
+  it('prunes deleted entries and duplicates while restoring the last remaining seen activity', () => {
+    const state: DrawState = { seenIds: ['c', 'c', 'a', 'removed'], lastIdeaId: 'removed' };
+    expect(resetSeenHistory(catalog, state, 'space')).toEqual({ seenIds: ['c'], lastIdeaId: 'c' });
+    expect(resetSeenHistory({ ideas: [], categories: [] }, state, 'space')).toEqual(emptyState);
+  });
+
+  it('uses current category membership and preserves valid history for a removed category', () => {
+    const state: DrawState = { seenIds: ['a', 'b', 'c'], lastIdeaId: 'c' };
+    const moved = { ...catalog, ideas: catalog.ideas.map((idea) => idea.id === 'a' ? { ...idea, categoryId: 'home' } : idea) };
+    expect(resetSeenHistory(moved, state, 'space')).toEqual({ seenIds: ['a', 'c'], lastIdeaId: 'c' });
+    expect(resetSeenHistory(catalog, state, 'removed-category')).toEqual(state);
+  });
+});
 
 describe('selectIdea', () => {
   it('shares seen ideas across category and all-category draws', () => {

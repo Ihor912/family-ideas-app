@@ -5,6 +5,16 @@ export type SelectionResult =
   | { kind: 'exhausted'; catalog: Catalog }
   | { kind: 'empty'; catalog: Catalog };
 
+/** Clear only the selected pool, without choosing or marking another activity. */
+export function resetSeenHistory(catalog: Catalog, state: DrawState, categoryId: string): DrawState {
+  const currentIdeas = new Map(catalog.ideas.map((idea) => [idea.id, idea]));
+  const seenIds = [...new Set(state.seenIds)].filter((id) => {
+    const idea = currentIdeas.get(id);
+    return idea && categoryId !== ALL_CATEGORIES && idea.categoryId !== categoryId;
+  });
+  return { seenIds, lastIdeaId: seenIds.at(-1) ?? null };
+}
+
 /** Global family history; an explicit reset clears only the selected category. */
 export function selectIdea(
   catalog: Catalog,

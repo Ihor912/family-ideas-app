@@ -91,4 +91,11 @@ export const firebaseServices: AppServices = {
     if (auth?.currentUser?.uid !== userId) throw new Error('The signed-in account changed.');
     return services.drawIdea(categoryId, reset);
   },
+  async resetHistory(categoryId) {
+    const userId = auth?.currentUser?.uid;
+    if (!userId) throw new Error('Sign in before resetting family progress.');
+    const services = await loadFamilyServices();
+    if (auth?.currentUser?.uid !== userId) throw new Error('The signed-in account changed.');
+    await services.resetHistory(categoryId);
+  },
 };
